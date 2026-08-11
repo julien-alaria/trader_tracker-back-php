@@ -1,0 +1,10 @@
+{
+    "name": "trader_tracker/php",
+    "description": "backend_php",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "firebase/php-jwt": "^7.1",
+        "vlucas/phpdotenv": "^5.6"
+    }
+}
