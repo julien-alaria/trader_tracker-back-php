@@ -3,6 +3,7 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 use TraderTracker\Php\Router;
+use TraderTracker\Php\Database;
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
@@ -16,6 +17,15 @@ $router = new Router();
 $router->get('/', function () {
     header('Content-Type: application/json');
     echo json_encode(["message" => "API running"]);
+});
+
+$router->get('/assets-types', function () {
+    header('Content-Type: application/json');
+
+    $db = Database::getConnection();
+    $stmt = $db->query("SELECT id, asset_type FROM assets_types");
+
+    echo json_encode($stmt->fetchAll());
 });
 
 $router->dispatch(
