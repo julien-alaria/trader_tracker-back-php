@@ -1,6 +1,6 @@
 <?php
 
-namespace TraderTracker\Php\services;
+namespace TraderTracker\Php\Services;
 
 use Firebase\JWT\JWT;
 
