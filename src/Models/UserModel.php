@@ -58,7 +58,7 @@ class UserModel {
         $stmt = $db->prepare($sql);
         $stmt->execute([
             $name, $email, $hashedPassword, $role, $analystTypeId,
-            false, $company, $bio, $picture, $document
+            0, $company, $bio, $picture, $document
         ]);
 
         return [
