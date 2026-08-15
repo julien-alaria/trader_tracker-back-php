@@ -71,4 +71,18 @@ class UserModel {
             'document' => $document,
         ];
     }
+
+    public static function getUsersById(int $id): ?array {
+        $db = Database::getConnection();
+
+        $sql = "SELECT id, name, email, role, analyst_type_id, analyst_verified, company, bio, picture FROM users WHERE id = ?";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$id]);
+        $result = $stmt->fetch();
+
+        return $result ?: null;
+
+
+    }
 }

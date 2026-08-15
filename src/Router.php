@@ -2,36 +2,36 @@
 
 namespace TraderTracker\Php;
 
-class Router
-{
+class Router {
+
     private array $routes = [];
 
-    public function get(string $path, callable|array $handler): void
+    public function get(string $path, callable|array ...$handlers): void
     {
-        $this->addRoute('GET', $path, $handler);
+        $this->addRoute('GET', $path, $handlers);
     }
 
-    public function post(string $path, callable|array $handler): void
+    public function post(string $path, callable|array ...$handlers): void
     {
-        $this->addRoute('POST', $path, $handler);
+        $this->addRoute('POST', $path, $handlers);
     }
 
-    public function put(string $path, callable|array $handler): void
+    public function put(string $path, callable|array ...$handlers): void
     {
-        $this->addRoute('PUT', $path, $handler);
+        $this->addRoute('PUT', $path, $handlers);
     }
 
-    public function delete(string $path, callable|array $handler): void
+    public function delete(string $path, callable|array ...$handlers): void
     {
-        $this->addRoute('DELETE', $path, $handler);
+        $this->addRoute('DELETE', $path, $handlers);
     }
 
-    private function addRoute(string $method, string $path, callable|array $handler): void
+    private function addRoute(string $method, string $path, array $handlers): void
     {
         $pattern = preg_replace('#:[a-zA-Z]+#', '([^/]+)', $path);
         $this->routes[$method][] = [
             'pattern' => "#^" . $pattern . "$#",
-            'handler' => $handler,
+            'handlers' => $handlers,
             'paramNames' => $this->extractParamNames($path),
         ];
     }
@@ -48,7 +48,17 @@ class Router
             if (preg_match($route['pattern'], $path, $matches)) {
                 array_shift($matches);
                 $params = array_combine($route['paramNames'], $matches);
-                call_user_func($route['handler'], $params);
+
+                try {
+                    foreach($route['handlers'] as $handler) {
+                        $result = call_user_func($handler, $params);
+                        if (is_array($result)) {
+                            $params = array_merge($params, $result);
+                        }
+                    }
+                } catch (\Throwable $e) {
+                \TraderTracker\Php\Utils\ErrorHandler::respond($e);
+                } 
                 return;
             }
         }
