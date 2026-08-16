@@ -4,8 +4,10 @@ use TraderTracker\Php\Controllers\AuthController;
 use TraderTracker\Php\Controllers\AssetController;
 use TraderTracker\Php\Controllers\AssetTypeController;
 use TraderTracker\Php\Controllers\UserController;
+use TraderTracker\Php\Controllers\RecommendationController;
 use TraderTracker\Php\Middlewares\AuthMiddleware;
 use TraderTracker\Php\Middlewares\AssetMiddleware;
+use TraderTracker\Php\Middlewares\SpecializationMiddleware;
 
 
 $router->get('/', function () {
@@ -40,6 +42,13 @@ $router->get('/users', AuthMiddleware::forRoles(['admin']), [UserController::cla
 $router->get('/users/:id', AuthMiddleware::forRoles(['admin']), [UserController::class, 'getUserById']);
 $router->put('/users/:id', AuthMiddleware::forRoles(['admin']), [UserController::class, 'updateUser']);
 $router->delete('/users/:id', AuthMiddleware::forRoles(['admin']), [UserController::class, 'deleteUser']);
+
+$router->get('/recommendations/me', AuthMiddleware::forRoles(['analyst', 'admin']), [RecommendationController::class, 'getMyRecommendation']);
+$router->get('/recommendations/analyst/:analystId', [RecommendationController::class, 'getRecommendationsByAnalyst']);
+$router->get('/recommendations', [RecommendationController::class, 'getRecommendationPagin']);
+$router->post('/recommendations', AuthMiddleware::forRoles(['analyst', 'admin']), [AssetMiddleware::class, 'handle'], [SpecializationMiddleware::class, 'handle'], [RecommendationController::class, 'createRecommendation']);
+$router->put('/recommendations/:id', AuthMiddleware::forRoles(['analyst', 'admin']), [RecommendationController::class, 'updateRecommendation']);
+$router->delete('/recommendations/:id', AuthMiddleware::forRoles(['analyst', 'admin']), [RecommendationController::class, 'deleteRecommendation']);
 
 $router->get('/assets-types', [AssetTypeController::class, 'index']);
 

@@ -98,4 +98,24 @@ class Validators
         $allowed = ['user', 'analyst', 'admin'];
         return in_array($role, $allowed, true) ? $role : "user";
     }
+
+    public static function validateComment(?string $comment): ?string {
+        $clean = $comment ? trim($comment) : null;
+
+        if ($clean && strlen($clean) > 280) {
+            throw new AppError("A recommendation must not exceed 280 characters");
+        }
+
+        return $clean;
+    }
+
+    public static function validateRecommendationsStatus(?string $status): string {
+        $allowed = ["BUY", "SELL", "HOLD"];
+
+        if (!in_array($status, $allowed, true)) {
+            throw new AppError("Invalid recommendation status");
+        }
+
+        return $status;
+    }
 }

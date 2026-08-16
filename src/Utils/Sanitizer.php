@@ -85,4 +85,41 @@ class Sanitizer
 
         return $sanitized;
     }
+
+    public static function sanitizeRecommendation(array $data): array {
+
+        $status = $data['status'] ?? null;
+        $comment = $data['comment'] ?? null;
+        $assetId = $data['asset_id'] ?? null;
+
+        if (!$status || !$assetId) {
+            throw new AppError("Missing required fields");
+        }
+
+        $assetId = filter_var($assetId, FILTER_VALIDATE_INT);
+
+        if ($assetId === false || $assetId <= 0) {
+            throw new AppError("Invalid asset id");
+        }
+
+        return [
+            'status' => Validators::validateRecommendationsStatus($status),
+            'comment' => Validators::validateComment($comment),
+            'asset_id' => $assetId,
+        ];
+    }
+
+    public static function sanitizeRecommendationUpdate(array $data): array {
+        $sanitized = [];
+
+        if (array_key_exists('status', $data)) {
+            $sanitized['status'] = Validators::validateRecommendationsStatus($data['status']);
+        }
+
+        if (array_key_exists('comment', $data)) {
+            $sanitized['comment'] = Validators::validateComment($data['comment']);
+        }
+
+        return $sanitized;
+    }
 }
