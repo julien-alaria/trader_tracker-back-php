@@ -208,7 +208,7 @@ class UserModel {
 
         if (array_key_exists('analyst_type_id', $data)) {
             $typeStmt = $db->prepare("SELECT id FROM assets_types WHERE id = ?");
-            $typeStmt->execute($data['analyst_type_id']);
+            $typeStmt->execute([$data['analyst_type_id']]);
 
             if ($typeStmt->fetch() === false) {
                 throw new AppError("Invalid analyst type");
@@ -265,5 +265,63 @@ class UserModel {
 
         $stmt = $db->prepare("DELETE FROM users WHERE id = ?");
         $stmt->execute([$id]);
+    }
+
+    public static function getUsersPaginated(int $limit, int $offset): array {
+        $db = Database::getConnection();
+
+        $sql = "SELECT id, name, email, role, company, bio, analyst_verified, analyst_type_id, created_at FROM users ORDER BY id DESC LIMIT ? OFFSET ?";
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(1, $limit, \PDO::PARAM_INT);
+        $stmt->bindValue(2, $offset, \PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public static function getAllAnalysts(): array {
+        $db = Database::getConnection();
+
+        $stmt = $db->query("SELECT id, name, company, bio, picture FROM users WHERE role = 'analyst'");
+        return $stmt->fetchAll();
+    }
+
+    public static function getAnalystsByType(int $typeId, int $limit, int $offset): array {
+        $db = Database::getConnection();
+
+        $parsedLimit = max(1, $limit ?: 5);
+        $parsedOffset = max(0, $offset);
+
+        $sql = "SELECT id, name, company, bio, picture FROM users WHERE role = 'analyst' AND analyst_type_id = ? LIMIT ? OFFSET ?";
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindValue(1, $typeId, \PDO::PARAM_INT);
+        $stmt->bindValue(2, $parsedLimit + 1, \PDO::PARAM_INT);
+        $stmt->bindValue(3, $parsedOffset, \PDO::PARAM_INT);
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
+
+        $hasNext = count($rows) > $parsedLimit;
+        if ($hasNext) array_pop($rows);
+
+        return ['results' => $rows, 'hasNext' => $hasNext];
+    }
+
+    public static function getAnalystById(int $id): ?array {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare("SELECT id, name,  company, bio, picture FROM users WHERE role = 'analyst' AND id = ?");    
+        $stmt->execute([$id]);
+        $result = $stmt->fetch();
+        return $result ?: null;
+    }
+
+    public static function getPendingAnalysts(): array {
+        $db = Database::getConnection();
+
+        $sql = "SELECT id, name, email, role, analyst_type_id, analyst_verified, company, bio, picture FROM users WHERE role = 'analyst' AND analyst_verified = 0";
+
+        $stmt = $db->query($sql);
+        return $stmt->fetchAll();
     }
 }
