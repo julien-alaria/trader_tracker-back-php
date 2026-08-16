@@ -75,7 +75,7 @@ class Validators
         return in_array($role, $allowed, true) ? $role : "user";
     }
 
-    public static function validateAnalystType(string $role, mixed $analystTypeId): ?int
+    public static function validateAnalystType(?string $role, mixed $analystTypeId): ?int
     {
         if ($role !== "analyst") {
             return null;
@@ -92,5 +92,10 @@ class Validators
         }
 
         return $id;
+    }
+
+    public static function safeRole(?string $role): string {
+        $allowed = ['user', 'analyst', 'admin'];
+        return in_array($role, $allowed, true) ? $role : "user";
     }
 }

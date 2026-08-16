@@ -179,4 +179,91 @@ class UserModel {
         $stmt = $db->prepare("DELETE FROM user_follows WHERE follower_id = ? AND followed_id = ?");
         $stmt->execute([$userId, $followuserId]);
     }
+
+    public static function updateUsers(int $id, array $data): array {
+        $db = Database::getConnection();
+
+        $fields = [];
+        $values = [];
+
+        if (array_key_exists('name', $data)) {
+            $fields[] = "name = ?";
+            $values[] = $data['name'];
+        }
+
+        if (array_key_exists('email', $data)) {
+            $fields[] = "email = ?";
+            $values[] = $data['email'];
+        }
+
+        if (array_key_exists('password', $data)) {
+            $fields[] = "password = ?";
+            $values[] = $data['password'];
+        }
+
+        if (array_key_exists('role', $data)) {
+            $fields[] = "role = ?";
+            $values[] = $data['role'];
+        }
+
+        if (array_key_exists('analyst_type_id', $data)) {
+            $typeStmt = $db->prepare("SELECT id FROM assets_types WHERE id = ?");
+            $typeStmt->execute($data['analyst_type_id']);
+
+            if ($typeStmt->fetch() === false) {
+                throw new AppError("Invalid analyst type");
+            }
+
+            $fields[] = "analyst_type_id = ?";
+            $values[] = (int) $data['analyst_type_id'];
+        }
+
+        if (array_key_exists('analyst_verified', $data)) {
+            $fields[] = "analyst_verified = ?";
+            $values[] = $data['analyst_verified'] ? 1 : 0;
+        }
+
+        if (array_key_exists('company', $data)) {
+            $fields[] = "company = ?";
+            $values[] = $data['company'];
+        }
+
+        if (array_key_exists('bio', $data)) {
+            $fields[] = "bio = ?";
+            $values[] = $data['bio'];
+        }
+
+        if (array_key_exists('picture', $data)) {
+            $fields[] = "picture = ?";
+            $values[] = $data['picture'];
+        }
+
+        if (array_key_exists('document', $data)) {
+            $fields[] = "document = ?";
+            $values[] = $data['document'];
+        }
+
+        if (empty($fields)) {
+            throw new AppError("No fields to update");
+        }
+
+        $values[] = $id;
+
+        $sql = "UPDATE users SET " . implode(", ", $fields) . " WHERE id = ?";
+        $stmt = $db->prepare($sql);
+        $stmt->execute($values);
+
+        if ($stmt->rowCount() === 0) {
+            throw new AppError("User not found");
+        }
+
+        return ['affectedRows' => $stmt->rowCount()];
+    }
+
+    public static function deleteUsers(int $id): void {
+        $db = Database::getConnection();
+
+        $stmt = $db->prepare("DELETE FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+    }
 }

@@ -16,7 +16,9 @@ $router->get('/', function () {
 $router->post('/auth/login', [AuthController::class, 'login']);
 $router->post('/auth/register', [AuthController::class, 'register']);
 
-$router->get('/users/me', [AuthMiddleware::class, 'handle'], [UserController::class, 'me']);
+$router->get('/users/me', [AuthMiddleware::class, 'handle'], [UserController::class, 'getMe']);
+$router->put('/users/me', [AuthMiddleware::class, 'handle'], [UserController::class, 'updateMe']);
+$router->delete('/users/me', [AuthMiddleware::class, 'handle'], [UserController::class, 'deleteMe']);
 
 $router->get('/users/me/watchlist', [AuthMiddleware::class, 'handle'], [UserController::class, 'getWatchlist']);
 $router->get('/users/me/watchlist-paginated', [AuthMiddleware::class, 'handle'], [UserController::class, 'getWatchlistPagin']);

@@ -4,12 +4,52 @@ namespace TraderTracker\Php\Controllers;
 
 use TraderTracker\Php\Models\UserModel;
 use TraderTracker\Php\Utils\AppError;
+use TraderTracker\Php\Utils\Sanitizer;
 
 class UserController {
 
-    public static function me(array $params): void {
+    public static function getMe(array $params): void {
         header('Content-Type: application/json');
-        echo json_encode($params['user']);
+        $userId = $params['user']['id'] ?? null;
+
+        if (!$userId) {
+            throw new AppError("Unauthorized", 401);
+        }
+
+        $result = UserModel::getUsersById($userId);
+
+        if (!$result) {
+            throw new AppError("User not found", 404);
+        }
+
+        echo json_encode(['result' => $result]);
+    }
+
+    public static function updateMe(array $params): void {
+        header('Content-Type: application/json');
+        $userId = $params['user']['id'];
+
+        $body = json_decode(file_get_contents('php://input'), true) ?? [];
+        $sanitizedData = Sanitizer::sanitizeUserUpdate($body);
+
+        unset($sanitizedData['role']);
+        unset($sanitizedData['analyst_type_id']);
+
+        if (empty($sanitizedData)) {
+            throw new AppError("No valid data", 400);
+        }
+
+        $result = UserModel::updateUsers($userId, $sanitizedData);
+
+        echo json_encode(['message' => 'Profile successfully updated', 'result' => $result]);
+    }
+
+    public static function deleteMe(array $params): void {
+        header('Content-Type: application/json');
+
+        UserModel::deleteUsers($params['user']['id']);
+        echo json_encode(['message' => 'Account deleted successfully']);
+
     }
 
     public static function getWatchlist(array $params): void {
