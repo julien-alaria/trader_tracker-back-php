@@ -6,6 +6,7 @@ use TraderTracker\Php\Models\RecommendationModel;
 use TraderTracker\Php\Models\AssetModel;
 use TraderTracker\Php\Utils\Sanitizer;
 use TraderTracker\Php\Utils\AppError;
+use TraderTracker\Php\Utils\RequestBody;
 
 class RecommendationController {
 
@@ -70,7 +71,7 @@ class RecommendationController {
             throw new AppError("You are not authorized to psot on this type of asset.", 403);
         }
 
-        $body = json_decode(file_get_contents('php://input'), true) ?? [];
+        $body = RequestBody::parse();
 
         $sanitizedData = Sanitizer::sanitizeRecommendation([
             'status' => $body['status'] ?? null,
@@ -95,7 +96,7 @@ class RecommendationController {
             throw new AppError("Invalid ID", 400);
         }
 
-        $body = json_decode(file_get_contents('php://INPUT'), true) ?? [];
+        $body = RequestBody::parse();
         $sanitizedData = Sanitizer::sanitizeRecommendationUpdate($body);
 
         if (empty($sanitizedData)) {

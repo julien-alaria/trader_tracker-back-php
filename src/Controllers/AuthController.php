@@ -8,6 +8,7 @@ use TraderTracker\Php\Utils\Sanitizer;
 use TraderTracker\Php\Utils\Password;
 use TraderTracker\Php\Utils\AppError;
 use TraderTracker\Php\Utils\ErrorHandler;
+use TraderTracker\Php\Utils\RequestBody;
 use TraderTracker\Php\Services\AuthTokenService;
 
 class AuthController {
@@ -16,7 +17,7 @@ class AuthController {
         header('Content-Type: application/json');
 
         try {
-            $body = json_decode(file_get_contents('php://input'), true) ?? [];
+            $body = RequestBody::parse();
             $data = Sanitizer::sanitizeLogin($body);
 
             $user = UserModel::getUsersByEmail($data['email']);
@@ -43,7 +44,7 @@ class AuthController {
         header('Content-Type: application/json');
 
         try {
-            $body = json_decode(file_get_contents('php://input'), true) ?? [];
+            $body = RequestBody::parse();
             $sanitizedData = Sanitizer::sanitizeUser($body);
 
             $sanitizedData['picture'] = null;

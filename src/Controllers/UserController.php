@@ -5,6 +5,7 @@ namespace TraderTracker\Php\Controllers;
 use TraderTracker\Php\Models\UserModel;
 use TraderTracker\Php\Utils\AppError;
 use TraderTracker\Php\Utils\Sanitizer;
+use TraderTracker\Php\Utils\RequestBody;
 
 class UserController {
 
@@ -29,7 +30,7 @@ class UserController {
         header('Content-Type: application/json');
         $userId = $params['user']['id'];
 
-        $body = json_decode(file_get_contents('php://input'), true) ?? [];
+        $body = RequestBody::parse();
         $sanitizedData = Sanitizer::sanitizeUserUpdate($body);
 
         unset($sanitizedData['role']);
@@ -173,7 +174,7 @@ class UserController {
             throw new AppError("Invalid ID", 400);
         }
 
-        $body = json_decode(file_get_contents('php://input'), true) ?? [];
+        $body = RequestBody::parse();
         $sanitizedData = Sanitizer::sanitizeUserUpdate($body);
 
         if (array_key_exists('analyst_verified', $body)) {
