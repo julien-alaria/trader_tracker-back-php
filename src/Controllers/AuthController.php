@@ -40,15 +40,15 @@ class AuthController {
         }
     }
 
-    public static function register(): void {
+    public static function register(array $params = []): void {
         header('Content-Type: application/json');
 
         try {
             $body = RequestBody::parse();
             $sanitizedData = Sanitizer::sanitizeUser($body);
 
-            $sanitizedData['picture'] = null;
-            $sanitizedData['document'] = null;
+            $sanitizedData['picture'] = $params['picture'] ?? null;
+            $sanitizedData['document'] = $params['document'] ?? null;
 
             $user = UserModel::createUsers($sanitizedData);
             $token = AuthTokenService::generateToken($user);

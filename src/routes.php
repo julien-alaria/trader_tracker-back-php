@@ -8,6 +8,7 @@ use TraderTracker\Php\Controllers\RecommendationController;
 use TraderTracker\Php\Middlewares\AuthMiddleware;
 use TraderTracker\Php\Middlewares\AssetMiddleware;
 use TraderTracker\Php\Middlewares\SpecializationMiddleware;
+use TraderTracker\Php\Middlewares\UploadMiddleware;
 
 
 $router->get('/', function () {
@@ -16,10 +17,10 @@ $router->get('/', function () {
 });
 
 $router->post('/auth/login', [AuthController::class, 'login']);
-$router->post('/auth/register', [AuthController::class, 'register']);
+$router->post('/auth/register', UploadMiddleware::forFields(['picture', 'document']), [AuthController::class, 'register']);
 
-$router->get('/users/me', AuthMiddleware::forRoles(),[UserController::class, 'getMe']);
-$router->put('/users/me', AuthMiddleware::forRoles(), [UserController::class, 'updateMe']);
+$router->get('/users/me', AuthMiddleware::forRoles(), [UserController::class, 'getMe']);
+$router->put('/users/me', AuthMiddleware::forRoles(), UploadMiddleware::forFields(['picture']), [UserController::class, 'updateMe']);
 $router->delete('/users/me', AuthMiddleware::forRoles(), [UserController::class, 'deleteMe']);
 
 $router->get('/users/me/watchlist', AuthMiddleware::forRoles(), [UserController::class, 'getWatchlist']);
@@ -40,7 +41,7 @@ $router->get('/users/analysts', [UserController::class, 'getAnalysts']);
 $router->get('/users/pending-analysts', AuthMiddleware::forRoles(['admin']), [UserController::class, 'getPendingAnalyst']);
 $router->get('/users', AuthMiddleware::forRoles(['admin']), [UserController::class, 'getUserPagin']);
 $router->get('/users/:id', AuthMiddleware::forRoles(['admin']), [UserController::class, 'getUserById']);
-$router->put('/users/:id', AuthMiddleware::forRoles(['admin']), [UserController::class, 'updateUser']);
+$router->put('/users/:id', AuthMiddleware::forRoles(['admin']), UploadMiddleware::forFields(['picture', 'document']), [UserController::class, 'updateUser']);
 $router->delete('/users/:id', AuthMiddleware::forRoles(['admin']), [UserController::class, 'deleteUser']);
 
 $router->get('/recommendations/me', AuthMiddleware::forRoles(['analyst', 'admin']), [RecommendationController::class, 'getMyRecommendation']);

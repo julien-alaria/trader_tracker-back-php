@@ -36,6 +36,10 @@ class UserController {
         unset($sanitizedData['role']);
         unset($sanitizedData['analyst_type_id']);
 
+        if (isset($params['picture'])) {
+            $sanitizedData['picture'] = $params['picture'];
+        }
+
         if (empty($sanitizedData)) {
             throw new AppError("No valid data", 400);
         }
@@ -179,6 +183,14 @@ class UserController {
 
         if (array_key_exists('analyst_verified', $body)) {
             $sanitizedData['analyst_verified'] = ((int) $body['analyst_verified']) === 1 ? 1 : 0;
+        }
+
+        if (isset($params['picture'])) {
+            $sanitizedData['picture'] = $params['picture'];
+        }
+
+        if (isset($params['document'])) {
+            $sanitizedData['document'] = $params['document'];
         }
 
         if (empty($sanitizedData)) {
