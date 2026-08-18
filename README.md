@@ -28,8 +28,8 @@ Create a `.env` file at the project root:
 ```dotenv
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_USER=
-DB_PASSWORD=
+DB_USER=your_user-name
+DB_PASSWORD=your_db_password
 DB_DATABASE=trader_tracker
 JWT_SECRET=change_this_secret_in_production
 APP_PORT=8000
