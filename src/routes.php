@@ -5,6 +5,8 @@ use TraderTracker\Php\Controllers\AssetController;
 use TraderTracker\Php\Controllers\AssetTypeController;
 use TraderTracker\Php\Controllers\UserController;
 use TraderTracker\Php\Controllers\RecommendationController;
+use TraderTracker\Php\Controllers\StockController;
+
 use TraderTracker\Php\Middlewares\AuthMiddleware;
 use TraderTracker\Php\Middlewares\AssetMiddleware;
 use TraderTracker\Php\Middlewares\SpecializationMiddleware;
@@ -52,6 +54,18 @@ $router->put('/recommendations/:id', AuthMiddleware::forRoles(['analyst', 'admin
 $router->delete('/recommendations/:id', AuthMiddleware::forRoles(['analyst', 'admin']), [RecommendationController::class, 'deleteRecommendation']);
 
 $router->get('/assets-types', [AssetTypeController::class, 'index']);
-
 $router->get('/assets', [AssetController::class, 'index']);
+
+$router->get('/assets/stocks', [StockController::class, 'getAllStocks']);
+$router->get('/assets/forex', [StockController::class, 'getForex']);
+$router->get('/assets/commodities', [StockController::class, 'getCommodities']);
+
+$router->get('/assets/home/stocks', [StockController::class, 'getHomeStocks']);
+$router->get('/assets/home/forex', [StockController::class, 'getHomeForex']);
+$router->get('/assets/home/commodities', [StockController::class, 'getHomeCommodities']);
+
+$router->get('/assets/brief/all', [StockController::class, 'getCombinedBriefAssets']);
+
+$router->get('/assets/details/:ticker', [AssetController::class, 'show']);
 $router->get('/assets/:ticker', [AssetController::class, 'show']);
+

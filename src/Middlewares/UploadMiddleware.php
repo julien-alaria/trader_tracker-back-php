@@ -3,6 +3,7 @@
 namespace TraderTracker\Php\Middlewares;
 
 use TraderTracker\Php\Utils\AppError;
+use TraderTracker\Php\Utils\MultipartParser;
 
 class UploadMiddleware {
 
@@ -22,12 +23,16 @@ class UploadMiddleware {
         return function (array $params) use ($fieldNames) {
             $uploaded = [];
 
+            $source = $_SERVER['REQUEST_METHOD'] === 'POST' ? $_FILES : MultipartParser::parse()['files'];
+
+            $isRealPhpUpload = $_SERVER['REQUEST_METHOD'] === 'POST';
+
             foreach ($fieldNames as $field) {
-                if (!isset($_FILES[$field]) || $_FILES[$field]['error'] === UPLOAD_ERR_NO_FILE) {
+                if (!isset($source[$field]) || $source[$field]['error'] === UPLOAD_ERR_NO_FILE) {
                     continue;
                 }
 
-                $uploaded[$field] = self::handleSingleFile($_FILES[$field], $field);
+                $uploaded[$field] = self::handleSingleFile($source[$field], $field, $isRealPhpUpload);
             }
 
             return $uploaded;
@@ -35,7 +40,7 @@ class UploadMiddleware {
         };
     }
 
-    private static function handleSingleFile(array $file, string $fieldName): string {
+    private static function handleSingleFile(array $file, string $fieldName, bool $isRealPhpUpload): string {
 
         if ($file['error'] !== UPLOAD_ERR_OK) {
             if (in_array($file['error'], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true)) {
@@ -56,7 +61,8 @@ class UploadMiddleware {
         }
 
         $ext = self::MIME_TO_EXT[$file['type']] ?? '';
-        $userEmail = isset($_POST['email']) ? strtolower(preg_replace('/[@.]/', '-', $_POST['email'])) : 'anonymous';
+        $fields = $isRealPhpUpload ? $_POST : MultipartParser::parse()['fields'];
+        $userEmail = isset($fields['email']) ? strtolower(preg_replace('/[@.]/', '-', $fields['email'])) : 'anonymous';
 
         $uniqueSuffix = time() . '-' . random_int(0, 999999999);
         $filename = "{$fieldName}-{$userEmail}-{$uniqueSuffix}{$ext}";
@@ -67,7 +73,11 @@ class UploadMiddleware {
             mkdir($uploadDir, 0755, true);
         }
 
-        if (!move_uploaded_file($file['tmp_name'], $uploadDir . $filename)) {
+        $destination = $uploadDir . $filename;
+
+        $moved = $isRealPhpUpload ? move_uploaded_file($file['tmp_name'], $destination) : rename($file['tmp_name'], $destination);
+
+        if (!$moved) {
             throw new AppError("Failed to save uploaded file", 500);
         }
 
