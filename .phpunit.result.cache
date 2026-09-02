@@ -1,0 +1,1 @@
+{"version":2,"defects":[],"times":{"TraderTracker\\Php\\Tests\\Utils\\ValidatorsTest::testValidateEmailRejectsinvalidEmail":0.001,"TraderTracker\\Php\\Tests\\Utils\\ValidatorsTest::testValidateNameRejectsForbiddenCharacters":0,"TraderTracker\\Php\\Tests\\Utils\\ValidatorsTest::testValidateEmailAcceptsValidEmail":0.001}}

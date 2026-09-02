@@ -11,5 +11,16 @@
         "psr-4": {
             "TraderTracker\\Php\\": "src/"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TraderTracker\\Php\\Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^13.3"
+    },
+    "scripts": {
+        "test": "phpunit"
     }
 }
