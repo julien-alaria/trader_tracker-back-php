@@ -2,8 +2,7 @@
 
 namespace TraderTracker\Php\Utils;
 
-class MultipartParser
-{
+class MultipartParser {
     private static ?array $parsed = null;
 
     public static function parse(): array

@@ -2,8 +2,7 @@
 
 namespace TraderTracker\Php\Utils;
 
-class Sanitizer
-{
+class Sanitizer {
     public static function sanitizeUser(array $data): array {
         $name = $data['name'] ?? null;
         $email = $data['email'] ?? null;

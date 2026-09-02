@@ -4,12 +4,10 @@ namespace TraderTracker\Php;
 
 use PDO;
 
-class Database
-{
+class Database {
     private static ?PDO $connection = null;
 
-    public static function getConnection(): PDO
-    {
+    public static function getConnection(): PDO {
         if (self::$connection === null) {
             $host = $_ENV['DB_HOST'];
             $port = $_ENV['DB_PORT'] ?? 3306;

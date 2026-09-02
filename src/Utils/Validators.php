@@ -2,10 +2,8 @@
 
 namespace TraderTracker\Php\Utils;
 
-class Validators
-{
-    public static function validateName(?string $name): string
-    {
+class Validators {
+    public static function validateName(?string $name): string {
         if (!$name) {
             throw new AppError("Name required");
         }
@@ -19,8 +17,7 @@ class Validators
         return $clean;
     }
 
-    public static function validateEmail(?string $email): string
-    {
+    public static function validateEmail(?string $email): string {
         if (!$email) {
             throw new AppError("Email required");
         }
@@ -34,8 +31,7 @@ class Validators
         return $clean;
     }
 
-    public static function validatePassword(?string $password): string
-    {
+    public static function validatePassword(?string $password): string {
         if (!$password) {
             throw new AppError("Password required");
         }
@@ -69,14 +65,12 @@ class Validators
         return $clean;
     }
 
-    public static function safePublicRole(?string $role): string
-    {
+    public static function safePublicRole(?string $role): string {
         $allowed = ["user", "analyst"];
         return in_array($role, $allowed, true) ? $role : "user";
     }
 
-    public static function validateAnalystType(?string $role, mixed $analystTypeId): ?int
-    {
+    public static function validateAnalystType(?string $role, mixed $analystTypeId): ?int {
         if ($role !== "analyst") {
             return null;
         }
