@@ -4,13 +4,13 @@ namespace TraderTracker\Php\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
 
-class AuthIntegrationTest extends TestCase
-{
+class AuthIntegrationTest extends TestCase {
     private const BASE_URL = 'http://localhost:8000';
 
     private function request(string $method, string $path, array $data = [], ?string $token = null): array
     {
         $headers = ["Content-Type: application/json"];
+
         if ($token) {
             $headers[] = "Authorization: Bearer $token";
         }
@@ -32,8 +32,7 @@ class AuthIntegrationTest extends TestCase
         return ['status' => $statusCode, 'body' => json_decode($body, true)];
     }
 
-    public function testRegisterThenLoginThenDeleteAccount(): void
-    {
+    public function testRegisterThenLoginThenDeleteAccount(): void {
         $email = 'integration-' . uniqid() . '@test.com';
 
         $register = $this->request('POST', '/auth/register', [
@@ -53,5 +52,28 @@ class AuthIntegrationTest extends TestCase
 
         $delete = $this->request('DELETE', '/users/me', [], $token);
         $this->assertEquals(200, $delete['status']);
+
     }
+
+    public function testAdminRouteRejectsRegularUser(): void {
+        $email = 'regular-' . uniqid() . '@test.com';
+
+        $this->request('POST', '/auth/register', [
+            'name' => 'Regular User',
+            'email' => $email,
+            'password' => 'Abcdef1!',
+        ]);
+
+        $login = $this->request('POST', '/auth/login', [
+            'email' => $email,
+            'password' => 'Abcdef1!',
+        ]);
+        $token = $login['body']['token'];
+
+        $response = $this->request('GET', '/users', [], $token);
+
+        $this->assertEquals(403, $response['status']);
+
+    }
+
 }
