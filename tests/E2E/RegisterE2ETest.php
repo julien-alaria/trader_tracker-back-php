@@ -5,17 +5,15 @@ namespace TraderTracker\Php\Tests\E2E;
 use Facebook\WebDriver\WebDriverBy;
 use Symfony\Component\Panther\PantherTestCase;
 
-class RegisterE2ETest extends PantherTestCase
-{
-    public function testRegisterThenLoginThenDeleteAccount(): void
-    {
+class RegisterE2ETest extends PantherTestCase {
+
+    public function testRegisterThenLoginThenDeleteAccount(): void {
+
         $client = static::createPantherClient(['external_base_uri' => 'http://127.0.0.1:5501']);
         $email = 'e2e-' . uniqid() . '@test.com';
 
         // 1. Inscription
         $client->request('GET', '/#/register');
-        $client->takeScreenshot('/tmp/panther-debug.png');
-        var_dump($client->getWebDriver()->manage()->getLog('browser'));
         $client->waitFor('input[name="name"]');
 
         $client->submitForm('submit', [
@@ -44,13 +42,23 @@ class RegisterE2ETest extends PantherTestCase
 
         // 3. Suppression du compte
         $client->waitFor('#delete-account-btn');
-        $client->findElement(WebDriverBy::id('delete-account-btn'))->click();
 
-        // la modal de confirmation s'ouvre, on clique sur son bouton de confirmation
-        $client->waitFor("//*[contains(., 'Permanently delete')]");
-        $client->findElement(WebDriverBy::xpath("//*[contains(., 'Permanently delete')]"))->click();
+        $modalOpened = false;
+        for ($i = 0; $i < 10 && !$modalOpened; $i++) {
+            $client->findElement(WebDriverBy::id('delete-account-btn'))->click();
+            try {
+                $client->waitFor('#confirm-modal-confirm', 1);
+                $modalOpened = true;
+            } catch (\Exception $e) {
+                // le gestionnaire n'est pas encore attaché, on retente
+            }
+        }
 
-        $client->wait(3)->until(
+        $this->assertTrue($modalOpened, 'La modal de confirmation ne s\'est jamais ouverte.');
+
+        $client->findElement(WebDriverBy::id('confirm-modal-confirm'))->click();
+
+        $client->wait(8)->until(
             fn() => $client->getCurrentURL() === 'http://127.0.0.1:5501/#/'
         );
         $this->assertStringNotContainsString('/#/user', $client->getCurrentURL());
