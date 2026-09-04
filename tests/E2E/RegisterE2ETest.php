@@ -50,7 +50,7 @@ class RegisterE2ETest extends PantherTestCase {
                 $client->waitFor('#confirm-modal-confirm', 1);
                 $modalOpened = true;
             } catch (\Exception $e) {
-                // le gestionnaire n'est pas encore attaché, on retente
+                // retry
             }
         }
 
