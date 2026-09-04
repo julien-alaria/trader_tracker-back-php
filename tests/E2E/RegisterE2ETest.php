@@ -12,7 +12,7 @@ class RegisterE2ETest extends PantherTestCase {
         $client = static::createPantherClient(['external_base_uri' => 'http://127.0.0.1:5501']);
         $email = 'e2e-' . uniqid() . '@test.com';
 
-        // 1. Inscription
+        // 1. Register
         $client->request('GET', '/#/register');
         $client->waitFor('input[name="name"]');
 
@@ -40,7 +40,7 @@ class RegisterE2ETest extends PantherTestCase {
         );
         $this->assertStringContainsString('/#/user', $client->getCurrentURL());
 
-        // 3. Suppression du compte
+        // 3. Delete
         $client->waitFor('#delete-account-btn');
 
         $modalOpened = false;
