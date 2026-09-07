@@ -108,3 +108,16 @@ mysql/init/             → SQL schema and seed data
 ## Testing
 
 No automated testing framework is currently in place; each route was manually validated (using Postman and a browser) during development. Potential area for improvement: adding PHPUnit to cover validators and sanitization logic.
+
+## AI Assistant (RAG) — prerequisites
+
+This optional feature requires [Ollama](https://ollama.com) installed locally, with two models pulled:
+
+    ollama pull nomic-embed-text
+    ollama pull qwen2.5-coder:7b
+
+After cloning, populate the vector table by running:
+
+    php src/scripts/seed_documentation.php
+
+Without Ollama running, all other features of the application work normally — only the `/assistant` endpoint is affected, returning a 503 error.

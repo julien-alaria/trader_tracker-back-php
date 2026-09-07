@@ -78,3 +78,11 @@ CREATE TABLE user_follows (
   FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (followed_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+CREATE TABLE documentation_chunks (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  section_title VARCHAR(255) NOT NULL,
+  content TEXT NOT NULL,
+  embedding JSON NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

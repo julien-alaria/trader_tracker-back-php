@@ -6,6 +6,7 @@ use TraderTracker\Php\Controllers\AssetTypeController;
 use TraderTracker\Php\Controllers\UserController;
 use TraderTracker\Php\Controllers\RecommendationController;
 use TraderTracker\Php\Controllers\StockController;
+use TraderTracker\Php\Controllers\AssistantController;
 
 use TraderTracker\Php\Middlewares\AuthMiddleware;
 use TraderTracker\Php\Middlewares\AssetMiddleware;
@@ -17,6 +18,8 @@ $router->get('/', function () {
     header('Content-Type: application/json');
     echo json_encode(["message" => "API running"]);
 });
+
+$router->post('/assistant', [AssistantController::class, 'ask']);
 
 $router->post('/auth/login', [AuthController::class, 'login']);
 $router->post('/auth/register', UploadMiddleware::forFields(['picture', 'document']), [AuthController::class, 'register']);
